@@ -30,9 +30,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("---");
 
     let start_time = Instant::now();
+    let mut prepared_img = PreparedImage::prepare(img_gray.clone());
 
     for i in 0..args.loops {
-        let mut prepared_img = PreparedImage::prepare(img_gray.clone());
         let grids = prepared_img.detect_grids();
 
         if i == 0 {
@@ -44,6 +44,18 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("Found QR Code #{}: {}", idx + 1, content);
                 }
             }
+        }
+    }
+    println!("\n\n");
+
+    let mut prepared_img = PreparedImage::prepare(img_gray.clone());
+    let grids = prepared_img.detect_rmqr_grids();
+    if grids.is_empty() {
+        println!("No rMQR codes detected.");
+    } else {
+        for (idx, grid) in grids.into_iter().enumerate() {
+            let (_meta, content) = grid.decode()?;
+            println!("Found rMQR Code #{}: {}", idx + 1, content);
         }
     }
 
