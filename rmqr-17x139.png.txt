@@ -1,0 +1,7 @@
+top-left 20,20
+top-right 1410,20
+bottom-left 20,190
+bottom-right 1410,190
+finder 55,55
+sub-finder 1385,165
+

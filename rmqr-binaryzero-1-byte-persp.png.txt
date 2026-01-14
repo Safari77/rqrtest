@@ -1,0 +1,8 @@
+top left 238,124
+top right 1050,161
+bottom left 174,544
+bottom right 968,494
+finder center 350,260
+sub-finder center 924,420
+
+
