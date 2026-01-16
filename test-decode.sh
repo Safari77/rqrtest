@@ -2,6 +2,11 @@
 export NOW=$(date +%s)||exit 1
 export DUMPOUT=qrtests-"${NOW}".txt
 
+if [[ ! -x ./target/release/rqrtest ]]; then
+    echo ./target/release/rqrtest must be executable
+    exit 1
+fi
+
 for ecc in M H; do
     (echo ECC level $ecc; for i in $(seq 1 32); do
         if [[ -f rmqr_versions/rmqr_v"${i}"_"${ecc}".png ]]; then

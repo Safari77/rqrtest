@@ -4,3 +4,5 @@ bottom left 174,544
 bottom right 968,494
 finder center 350,260
 sub-finder center 924,420
+Bit 0: 972,330
+

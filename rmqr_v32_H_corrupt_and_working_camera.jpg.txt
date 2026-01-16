@@ -1,6 +1,18 @@
+#1
+top-left 160,160
+top-right 3877,174
+bottom-right 3876,624
+bottom-left 160,614
+finder 253,247
+sub-finder 3812,560
+Bit 0: 3837,480
+
+#2
 top-left 160,896
 bottom-left 159,1351
 top-right 3875,904
 bottom-right 3871,1356
 finder 252,985
 sub-finder 3805,1292
+Bit 0: 3833,1290
+
