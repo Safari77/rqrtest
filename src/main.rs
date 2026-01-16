@@ -1,3 +1,4 @@
+use clap::ArgGroup;
 use clap::Parser;
 use image::ImageReader;
 use std::error::Error;
@@ -14,6 +15,12 @@ use rqrr::RmqrGridLocation;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
+#[command(group(
+    ArgGroup::new("binarizer")
+        .args(["use_hybrid_binarizer", "use_adaptive"])
+        .required(false)
+        .multiple(false)
+))]
 struct Args {
     #[arg(value_name = "FILE")]
     file: PathBuf,
@@ -51,6 +58,10 @@ struct Args {
     #[arg(long, default_value_t = false)]
     contrast_stretch: bool,
 
+    /// Use HybridBinarizer
+    #[arg(long, default_value_t = false)]
+    use_hybrid_binarizer: bool,
+
     /// Use adaptive thresholding
     #[arg(long, default_value_t = false)]
     use_adaptive: bool,
@@ -85,6 +96,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         threshold_bias: args.threshold_bias,
         rgb_bias: args.rgb_bias.unwrap_or([0.299, 0.587, 0.114]),
         contrast_stretch: args.contrast_stretch,
+        use_hybrid_binarizer: args.use_hybrid_binarizer,
         use_adaptive: args.use_adaptive,
         adaptive_block_radius: args.adaptive_block_radius,
         adaptive_threshold_delta: args.adaptive_threshold_delta,
