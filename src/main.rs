@@ -6,12 +6,8 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 use rqrr::prepare::{BasicImageBuffer, PreparationConfig};
-use rqrr::rmqr_detect;
-use rqrr::rmqr_finder;
 use rqrr::DeQRError;
 use rqrr::PreparedImage;
-use rqrr::RmqrGrid;
-use rqrr::RmqrGridLocation;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -116,7 +112,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let start_time = Instant::now();
 
     if run_qr {
-        let mut prepared_img = PreparedImage::prepare(gray_img.clone());
+        let mut prepared_img = PreparedImage::prepare_with_config(gray_img.clone(), config.clone());
 
         for i in 0..args.loops {
             let grids = prepared_img.detect_grids();
@@ -147,36 +143,29 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if run_rmqr {
-        let mut prepared_img = PreparedImage::prepare_with_config(gray_img.clone(), config);
-        let capstones = rmqr_finder::find_rmqr_capstones(&prepared_img);
-        let patterns = rmqr_detect::find_rmqr_patterns(&mut prepared_img, &capstones);
+        let mut prepared_img = PreparedImage::prepare_with_config(gray_img.clone(), config.clone());
 
-        // We scan for the sub-finder and verify format info here.
-        let regions = rmqr_detect::match_rmqr_patterns(&prepared_img, &patterns);
+        for i in 0..args.loops {
+            let grids = prepared_img.detect_rmqr_grids();
 
-        // 4. Convert Regions to Grids
-        let mut grids = Vec::new();
-        for region in regions {
-            // We attempt to create a grid location from the region
-            // Note: You might need to import RmqrGridLocation from your crate
-            if let Some(grid_loc) = RmqrGridLocation::from_region(&prepared_img, &region) {
-                let bounds = grid_loc.corners; // Save bounds for result
-                let grid = grid_loc.into_grid_image(&prepared_img);
-                grids.push(crate::RmqrGrid { grid, bounds });
-            }
-        }
-
-        // 5. Decode
-        if grids.is_empty() {
-            println!("No rMQR codes detected.");
-        } else {
-            for (idx, grid) in grids.into_iter().enumerate() {
-                match grid.decode() {
-                    Ok((_meta, content)) => println!("Found rMQR Code #{}: {}", idx + 1, content),
-                    Err(e) => {
-                        // Ignore FormatEcc errors which are common in noise
-                        if e != crate::DeQRError::FormatEcc {
-                            eprintln!("Failed to decode rMQR candidate #{}: {:?}", idx + 1, e);
+            if i == 0 {
+                if grids.is_empty() {
+                    println!("No rMQR codes detected.");
+                } else {
+                    for (idx, grid) in grids.into_iter().enumerate() {
+                        match grid.decode() {
+                            Ok((_meta, content)) => {
+                                println!("Found rMQR Code #{}: {}", idx + 1, content)
+                            }
+                            Err(e) => {
+                                if e != DeQRError::FormatEcc {
+                                    eprintln!(
+                                        "Failed to decode rMQR candidate #{}: {:?}",
+                                        idx + 1,
+                                        e
+                                    )
+                                }
+                            }
                         }
                     }
                 }
