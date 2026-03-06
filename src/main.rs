@@ -76,11 +76,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     if args.nodebug {
         rqrr::debug::disable_debug();
     }
-    if let Some(bias) = args.rgb_bias {
-        if bias.iter().any(|&v| !(0.0..=1.0).contains(&v)) {
+    if let Some(bias) = args.rgb_bias
+        && bias.iter().any(|&v| !(0.0..=1.0).contains(&v)) {
             return Err("rgb-bias values must be between 0.0 and 1.0".into());
         }
-    }
 
     // Determine execution mode
     // If no specific flag is provided, enable both.
@@ -96,7 +95,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         use_adaptive: args.use_adaptive,
         adaptive_block_radius: args.adaptive_block_radius,
         adaptive_threshold_delta: args.adaptive_threshold_delta,
-        ..Default::default()
     };
 
     println!("Loading image from: {:?}", args.file);
